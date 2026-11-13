@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "repo": "ronot-creator/gemini-skill-factory",
   "branch": "main",
-  "updated_at": "2026-11-13T20:08:51Z",
+  "updated_at": "2026-11-13T20:09:31Z",
   "raw_base": "https://raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main",
   "skills": {
     "gemini-skill-factory": {
@@ -10,12 +10,12 @@
       "entry": "SKILL.md",
       "files": {
         "SKILL.md": {
-          "sha256_lf": "63c289342c75fedd8b3a7ef89c547867775ecada767ca26e5d08562a8c63abc4",
-          "bytes": 13672
+          "sha256_lf": "cd2a914f816f84479e1ba593f9e81b6085daebd7b1d26a5550b88c3b31e3ee0c",
+          "bytes": 13754
         },
         "scripts/audit_repo_zip.py": {
-          "sha256_lf": "90c6ab44aa77f66f1b6c40c2e8ef696cb63b8a7bd1a3b7a07ab49d3da09871a8",
-          "bytes": 10182
+          "sha256_lf": "de3fc24af5ad25f86d3e464e6b1052def33a5abd6ab1a75a82254aea789e9455",
+          "bytes": 11199
         }
       },
       "total_files": 2
@@ -25,8 +25,8 @@
       "entry": "SKILL.md",
       "files": {
         "SKILL.md": {
-          "sha256_lf": "3073e15dcbeb84810d68a9d09f2eb8b2999a7aa824cf9884d9e55ce0fe36a94c",
-          "bytes": 8480
+          "sha256_lf": "fe177589ac8767b5bb40d30041ee8a76e17f2c8a018c0ca3dbc80f011a4512ac",
+          "bytes": 8587
         },
         "references/per-turn-snapshot-architecture.md": {
           "sha256_lf": "a65a8901d3fdc76cb2f81d24b82af8626637644cd7130da0a7dc567f050ae303",
