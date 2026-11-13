@@ -1,9 +1,9 @@
 ---
 name: skill-lifecycle-guardian
-description: MANDATORY AUTO-EXECUTION SKILL FOR ALL SKILL OPERATIONS. Load and execute this skill AUTOMATICALLY on ANY turn that creates, updates, edits, fixes, installs, imports, syncs, refactors, or manages any Gemini Skill, or before any call to skills:save_skill or skills:update_skill, even when the user does not explicitly mention this skill. Prevents empty blob ID errors via Two-Step Pre-Staged In-Place Updates and Write-Through Local Mount Mirroring.
+description: MANDATORY AUTO-EXECUTION SKILL FOR ALL SKILL OPERATIONS. Load and execute this skill AUTOMATICALLY on ANY turn that creates, updates, edits, fixes, installs, imports, syncs, refactors, or manages any Gemini Skill, or before any call to skills:save_skill or skills:update_skill, even when the user does not explicitly mention this skill. Prevents empty blob ID errors via Two-Step Pre-Staged In-Place Updates and Write-Through Local Mount Mirroring, and supports low-token self-updating from ronot-creator/gemini-skills.
 allowed-tools: default_api skills google
 ---
-# Skill Lifecycle Guardian (v1.1.0 - Mandatory Auto-Execution Hook)
+# Skill Lifecycle Guardian (v1.2.0 - Mandatory Auto-Execution Hook)
 
 Operate as an **always-on, automatic lifecycle interceptor** whenever any Gemini Skill is created, updated, edited, imported, or fixed. You MUST automatically apply this skill's Two-Step Pre-Staged + Write-Through Mirroring protocol before invoking `skills:save_skill` or `skills:update_skill`, even when the user only names the target skill they want to create or modify.
 
@@ -13,8 +13,9 @@ Automatically load and execute this skill whenever:
 
 - The user asks to create, update, edit, fix, polish, enhance, import, or install any skill (single-file or multi-file).
 - You are about to call `skills:save_skill` or `skills:update_skill` for any reason.
-- Another skill (such as `gemini-skill-factory` or `agency-orchestrator`) is creating, enhancing, or updating a skill.
+- Another skill (such as `gemini-skill-factory`) is creating, enhancing, or updating a skill.
 - A skill resource retrieval (`default_api:get_skill_resources`) reports `has empty blob ID` or stale content during the same turn as an update.
+- The user explicitly asks to **check for updates** or **update `skill-lifecycle-guardian`** from `ronot-creator/gemini-skills`.
 
 ## Core Architecture: Two-Tier Storage & Per-Turn Snapshot Isolation
 
@@ -61,6 +62,15 @@ Once `skills:update_skill` returns `status: "updated"`, the update is durably co
 - **Never delete `skills/user/<skill-name>/` in `Turn N`**: Deleting the local mirror during `Turn N` and calling `get_skill_resources` will hit the invalidated `Turn N` pointer (`has empty blob ID`) and cause a false-negative failure.
 - **Never create `-archived` rename-swap clones or embed Base85 blobs**: In-place `skills:update_skill` preserves the skill's UUID and updates all files natively in Google Cloud Blobstore; rename-swapping pollutes the user's Skills Manager UI, and Base85 blobs waste context tokens and trigger `ZIP_NOT_CLEAN`.
 - **Optional Same-Turn Cloud Verification via Subagent**: If you must verify Tier-2 Cloud Blobstore commitment before `Turn N` ends, spawn a read-only subagent via `default_api:invoke_subagent` (which boots a fresh session snapshot and can call `lookup_skills` and `get_skill_resources` directly against Tier 2).
+
+## Low-Token Self-Updating (`ronot-creator/gemini-skills`)
+
+When the user asks to check for or pull updates for `skill-lifecycle-guardian` (or when `gemini-skill-factory` checks the fleet):
+
+1. **Lazy / Explicit Trigger Gate**: Do not poll GitHub on unrelated turns. Check only when requested or during explicit skill-maintenance workflows.
+2. **Single-Pointer Manifest Check (`O(1)`)**: Fetch `https://raw.githubusercontent.com/ronot-creator/gemini-skills/main/manifest.json` via `google:browse` and compare `skills["skill-lifecycle-guardian"].version` and per-file `sha256_lf` hashes against local files. If identical, stop immediately (`0` extra fetches).
+3. **Delta-Only Fetch & Verification (`O(Delta)`)**: Fetch only files whose `sha256_lf` changed via `google:browse` from `https://raw.githubusercontent.com/ronot-creator/gemini-skills/<ref>/skill-lifecycle-guardian/<path>`, verify LF-normalized SHA-256 and static security rules (using `gemini-skill-factory/scripts/audit_repo_zip.py --verify-manifest` or equivalent SHA-256/regex check), and abort safely without touching local files if any check fails.
+4. **Zero-Loss Self-Update**: Stage verified files in `skills/skill-lifecycle-guardian/`, run `scripts/skill_sync.py --skill-name skill-lifecycle-guardian` (Tool Step A), and commit via `skills:update_skill` (Tool Step B).
 
 ## Bundled Resources
 

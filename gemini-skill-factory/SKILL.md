@@ -3,7 +3,7 @@ name: gemini-skill-factory
 description: Inspect, audit, cross-reference, convert, create, enhance, and self-update Gemini Skills from GitHub repository URLs, npx skills commands, Google Drive ZIP archives, or uploaded files. Supports low-token fleet self-updating via ronot-creator/gemini-skills manifest.json with hash-diff lazy pulls and automatically executes skill-lifecycle-guardian for zero-loss multi-file updates.
 allowed-tools: drive default_api skills google
 ---
-# Gemini Skill Factory (v2.3.0)
+# Gemini Skill Factory (v2.3.1)
 
 Automate the discovery, static security and malware screening, Gemini compatibility assessment, existing-library cross-referencing, synthesis, zero-loss multi-file registration/updating, and **low-token self-updating** of skills from **GitHub repository URLs**, **Google Drive ZIP archives**, or **uploaded packages**.
 
@@ -25,14 +25,14 @@ Automate the discovery, static security and malware screening, Gemini compatibil
 
 ## Mode D: Low-Token Self-Updating & Fleet Sync (`ronot-creator/gemini-skills`)
 
-To keep token usage near zero on normal conversations while giving non-technical users a seamless, one-step update path:
+To keep token usage near zero on normal conversations while giving non-technical users a seamless, one-step update path for `gemini-skill-factory` and `skill-lifecycle-guardian`:
 
 1. **Lazy / Explicit Trigger Gate (Zero Idle Overhead)**:
    - Do **not** poll GitHub on unrelated turns. Run this check only when the user explicitly asks to check/update skills OR when `@gemini-skill-factory` is invoked for a skill operation.
 2. **Single-Pointer Manifest Check (`O(1)` Token Cost)**:
    - Fetch ONLY the lightweight fleet manifest via `google:browse`:
      `https://raw.githubusercontent.com/ronot-creator/gemini-skills/main/manifest.json`
-   - Compare the remote `version` and per-file `sha256_lf` hashes for `gemini-skill-factory` (and any other installed fleet skills: `skill-lifecycle-guardian`, `llm-council`, `agency-orchestrator`) against the local installed files using `scripts/audit_repo_zip.py --hash-dir`.
+   - Compare the remote `version` and per-file `sha256_lf` hashes for `gemini-skill-factory` and `skill-lifecycle-guardian` against the local installed files using `scripts/audit_repo_zip.py --hash-dir`.
    - **Short-Circuit**: If all installed versions and `sha256_lf` hashes match, stop immediately (`0` extra fetches) and confirm everything is up to date.
 3. **Delta-Only Fetch & Anti-Torn-Read Verification (`O(Delta)` Cost)**:
    - Fetch **only** files whose `sha256_lf` differs from the local copy via `google:browse` from `https://raw.githubusercontent.com/ronot-creator/gemini-skills/<ref>/<skill>/<path>` (preferring `commit_sha` if pinned in `manifest.json`, otherwise `main`).

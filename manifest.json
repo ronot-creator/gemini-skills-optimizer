@@ -2,16 +2,16 @@
   "schema_version": "1.0",
   "repo": "ronot-creator/gemini-skills",
   "branch": "main",
-  "updated_at": "2026-11-13T19:10:00Z",
+  "updated_at": "2026-11-13T19:54:00Z",
   "raw_base": "https://raw.githubusercontent.com/ronot-creator/gemini-skills/main",
   "skills": {
     "gemini-skill-factory": {
-      "version": "2.3.0",
+      "version": "2.3.1",
       "entry": "SKILL.md",
       "files": {
         "SKILL.md": {
-          "sha256_lf": "dbfc1b4d75da2246410a5b79476075a7ed20bd7e6fdb1b8c1581d8b32c2c1532",
-          "bytes": 13628
+          "sha256_lf": "96c01c764818cd2d87401e5d011c431cdc1ac496efe55dab5677a14a79687a36",
+          "bytes": 13612
         },
         "scripts/audit_repo_zip.py": {
           "sha256_lf": "90c6ab44aa77f66f1b6c40c2e8ef696cb63b8a7bd1a3b7a07ab49d3da09871a8",
@@ -21,12 +21,12 @@
       "total_files": 2
     },
     "skill-lifecycle-guardian": {
-      "version": "1.1.0",
+      "version": "1.2.0",
       "entry": "SKILL.md",
       "files": {
         "SKILL.md": {
-          "sha256_lf": "70ced62c99ae18ecbf0acceedbba4135412af405c0872d2d742d237922690e3c",
-          "bytes": 6917
+          "sha256_lf": "2bf738b5db7ebcc2be42ce3f92bee4ff3aac98365288b929023390e71d2ed1e4",
+          "bytes": 8430
         },
         "references/per-turn-snapshot-architecture.md": {
           "sha256_lf": "a65a8901d3fdc76cb2f81d24b82af8626637644cd7130da0a7dc567f050ae303",
@@ -38,32 +38,6 @@
         }
       },
       "total_files": 3
-    },
-    "llm-council": {
-      "version": "1.0.0",
-      "entry": "SKILL.md",
-      "files": {
-        "SKILL.md": {
-          "sha256_lf": "816d5cb1596a6de4dd2c428166473b1273e4862d9351a1c260246912484c801c",
-          "bytes": 5858
-        }
-      },
-      "total_files": 1
-    },
-    "agency-orchestrator": {
-      "version": "2.0.0",
-      "entry": "SKILL.md",
-      "files": {
-        "SKILL.md": {
-          "sha256_lf": "a74b50f6d8ec00f500f5e7e2e53a6a2a54084ce4a407f3495fe53fad2c88de2c",
-          "bytes": 13224
-        },
-        "scripts/orchestrate.py": {
-          "sha256_lf": "9ddfa38dc0886b5631ff917b2f6e2430ebd9a87c3f7ac86da820245122715f67",
-          "bytes": 56682
-        }
-      },
-      "total_files": 50
     }
   }
 }
