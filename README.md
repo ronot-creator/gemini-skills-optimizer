@@ -13,7 +13,7 @@ Copy and paste this single prompt into Gemini:
 
 **Using a standard Gemini model without skill-saving tools?**  
 1. Click **Code → Download ZIP** on this repository and extract it.
-2. Compress `skill-lifecycle-guardian/` and `gemini-skill-factory/` into **two separate `.zip` files** (each `.zip` must contain one skill folder with `SKILL.md` inside it).
+2. Compress `skill-lifecycle-guardian/` and `gemini-skill-factory/` into **two separate `.zip` files** (each `.zip` must contain one skill folder with `SKILL.md` and its supporting files inside it).
 3. Upload each `.zip` in **Gemini → Skills Manager**.
 
 ---
