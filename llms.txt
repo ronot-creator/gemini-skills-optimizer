@@ -1,0 +1,12 @@
+# Gemini Skill Factory
+
+> The missing package manager and update guard for Gemini Apps skills. Inspect, security-scan, lint Claude-to-Gemini portability, install GitHub skill repos in 30 seconds, and prevent multi-file update corruption.
+
+## Key Files
+- [README.md](https://raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main/README.md): Quickstart, 1-line install prompt, and usage catalog.
+- [manifest.json](https://raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main/manifest.json): Fleet version and LF-normalized SHA-256 registry for low-token self-updating.
+- [gemini-skill-factory/SKILL.md](https://raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main/gemini-skill-factory/SKILL.md): Core package manager, security gate, and Claude-to-Gemini portability linter (v2.4.0).
+- [skill-lifecycle-guardian/SKILL.md](https://raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main/skill-lifecycle-guardian/SKILL.md): Two-step pre-staged + write-through mirroring guard (v1.3.0).
+
+## Quick Install Prompt for Gemini
+Browse https://github.com/ronot-creator/gemini-skill-factory (using raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main/ paths), inspect the files, and install both skill-lifecycle-guardian and gemini-skill-factory into my Gemini Skills library.
