@@ -1,0 +1,21 @@
+{
+  "skill": "skill-lifecycle-guardian",
+  "repo": "ronot-creator/gemini-skill-factory",
+  "version": "1.3.0",
+  "entry": "SKILL.md",
+  "files": {
+    "SKILL.md": {
+      "sha256_lf": "fe177589ac8767b5bb40d30041ee8a76e17f2c8a018c0ca3dbc80f011a4512ac",
+      "bytes": 8587
+    },
+    "references/per-turn-snapshot-architecture.md": {
+      "sha256_lf": "a65a8901d3fdc76cb2f81d24b82af8626637644cd7130da0a7dc567f050ae303",
+      "bytes": 3550
+    },
+    "scripts/skill_sync.py": {
+      "sha256_lf": "c1039506e5d4737f9103f2728ebda466e90d96ec98ba57f58f8351d5f6ae4e2c",
+      "bytes": 4402
+    }
+  },
+  "total_files": 3
+}

@@ -1,0 +1,65 @@
+name: Validate Skills & Update Manifest
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "gemini-skill-factory/**"
+      - "skill-lifecycle-guardian/**"
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-and-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate skill directories
+        run: |
+          python3 gemini-skill-factory/scripts/audit_repo_zip.py --validate gemini-skill-factory
+          python3 gemini-skill-factory/scripts/audit_repo_zip.py --validate skill-lifecycle-guardian
+      - name: Regenerate manifest.json on main push
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          python3 - <<'PY'
+          import hashlib, json
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          def sha256_lf(p: Path) -> str:
+              raw = p.read_bytes()
+              try:
+                  t = raw.decode("utf-8").replace("\r\n", "\n").rstrip("\n") + "\n"
+                  return hashlib.sha256(t.encode("utf-8")).hexdigest()
+              except UnicodeDecodeError:
+                  return hashlib.sha256(raw).hexdigest()
+
+          manifest = json.loads(Path("manifest.json").read_text(encoding="utf-8"))
+          manifest["updated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+          for sname, sdata in manifest["skills"].items():
+              sdir = Path(sname)
+              files_meta = {}
+              for f in sorted(sdir.rglob("*")):
+                  if f.is_file() and f.name != ".sync_manifest.json" and not f.name.startswith("."):
+                      rel = str(f.relative_to(sdir)).replace("\\", "/")
+                      if rel == "references/local_manifest.json":
+                          continue
+                      files_meta[rel] = {"sha256_lf": sha256_lf(f), "bytes": f.stat().st_size}
+              sdata["files"] = files_meta
+              sdata["total_files"] = len(files_meta)
+              (sdir / "references" / "local_manifest.json").write_text(
+                  json.dumps({"skill": sname, "repo": manifest["repo"], **sdata}, indent=2) + "\n",
+                  encoding="utf-8",
+              )
+          Path("manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add manifest.json */references/local_manifest.json
+          git diff --staged --quiet || git commit -m "chore: auto-sync manifest.json [skip ci]"
+          git push
