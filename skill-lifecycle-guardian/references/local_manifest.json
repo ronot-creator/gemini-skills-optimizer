@@ -5,8 +5,8 @@
   "entry": "SKILL.md",
   "files": {
     "SKILL.md": {
-      "sha256_lf": "fe177589ac8767b5bb40d30041ee8a76e17f2c8a018c0ca3dbc80f011a4512ac",
-      "bytes": 8587
+      "sha256_lf": "3073e15dcbeb84810d68a9d09f2eb8b2999a7aa824cf9884d9e55ce0fe36a94c",
+      "bytes": 8480
     },
     "references/per-turn-snapshot-architecture.md": {
       "sha256_lf": "a65a8901d3fdc76cb2f81d24b82af8626637644cd7130da0a7dc567f050ae303",
