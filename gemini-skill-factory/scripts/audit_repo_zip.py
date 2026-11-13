@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static repository, directory & ZIP auditor, manifest verifier, selector, and skill validator for Gemini Skill Factory v2.3.0."""
+"""Static repository, directory & ZIP auditor, compatibility linter, manifest verifier, selector, and skill validator for Gemini Skill Factory v2.4.0."""
 import argparse, hashlib, json, os, re, sys, zipfile
 from pathlib import Path
 
@@ -11,6 +11,20 @@ def get_security_rules():
         (r"curl\s+.*\|\s*(?:sh|bash)", "Piped remote shell execution"),
         (r"ignore\s+previous\s+instructions", "Prompt injection pattern"),
     ]
+
+def get_portability_warnings(txt: str) -> list[str]:
+    """Flag Claude/CLI dependencies that require adaptation or may not run in standard non-VM Gemini Apps."""
+    checks = [
+        (r"\b(Bash|WebFetch|TodoWrite|Skill tool)\b", "Claude tool syntax (map to execute_bash/google:browse/lookup_skills)"),
+        (r"(~/\.claude|\.claude/|CLAUDE\.md)", "Claude-specific config/directory path"),
+        (r"\b(mcp|fastmcp|stdio)\b", "External MCP server dependency (verify Gemini tool availability)"),
+        (r"\b(docker|tmux|systemctl|brew install|apt-get)\b", "Local OS/container dependency (unavailable in standard Gemini)"),
+    ]
+    found = []
+    for pat, label in checks:
+        if re.search(pat, txt, re.I):
+            found.append(label)
+    return found
 
 def sha256_lf(path: Path) -> str:
     """Compute SHA-256 over LF-normalized UTF-8 text (or raw bytes for binary) so web-reader line-ending normalization never breaks verification."""
@@ -30,6 +44,8 @@ def verify_against_manifest(skill_dir: Path, manifest_path: Path, skill_name: st
     mismatches, missing, sec_issues = [], [], []
     rules = get_security_rules()
     for rel_path, meta in expected_files.items():
+        if rel_path == "references/local_manifest.json":
+            continue
         target = skill_dir / rel_path
         if not target.exists():
             missing.append(rel_path)
@@ -102,10 +118,9 @@ def scan_directory_tree(ext_dir: Path, existing: dict) -> dict:
                     if re.search(pat, ftxt, re.I):
                         sec_issues.append(f"{f.name}: {label}")
 
-        needs_mod = entry_md.name != "SKILL.md" or any(
-            kw in txt for kw in ("Bash", "WebFetch", "Skill tool", "TodoWrite", ".claude")
-        )
-        compat = "Requires Modification" if needs_mod else "Compatible Directly"
+        portability_flags = get_portability_warnings(txt)
+        needs_mod = entry_md.name != "SKILL.md" or bool(portability_flags)
+        compat = f"Requires Modification ({'; '.join(portability_flags)})" if needs_mod else "Compatible Directly"
         overlap = "B/D (Existing Match: " + sname + ")" if sname in existing else "A (Entirely New Capability)"
         discovered.append({
             "id": idx,
@@ -115,6 +130,7 @@ def scan_directory_tree(ext_dir: Path, existing: dict) -> dict:
             "path": str(sdir),
             "files": rel_files,
             "compatibility": compat,
+            "portability_warnings": portability_flags,
             "security": "Passed" if not sec_issues else f"Rejected ({'; '.join(sec_issues)})",
             "overlap_category": overlap,
         })
@@ -138,7 +154,7 @@ def main():
         sdir = Path(args.hash_dir)
         files = {}
         for f in sorted(sdir.rglob("*")):
-            if f.is_file() and f.name != ".sync_manifest.json":
+            if f.is_file() and f.name != ".sync_manifest.json" and str(f.relative_to(sdir)).replace("\\", "/") != "references/local_manifest.json":
                 rel = str(f.relative_to(sdir)).replace("\\", "/")
                 files[rel] = {"sha256_lf": sha256_lf(f), "bytes": f.stat().st_size}
         print(json.dumps({"skill": args.skill_name or sdir.name, "files": files}, indent=2))
