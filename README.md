@@ -9,10 +9,12 @@ Paste any GitHub or Claude skill URL into Gemini and run it in 30 seconds—with
 
 Copy and paste this single prompt into Gemini:
 
-> `Browse https://github.com/ronot-creator/gemini-skill-factory (using raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main/ paths), inspect the skills, and install both skill-lifecycle-guardian and gemini-skill-factory into my Gemini Skills library.`
+> `Browse https://github.com/ronot-creator/gemini-skill-factory (using raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main/ paths), inspect the files, and install both skill-lifecycle-guardian and gemini-skill-factory into my Gemini Skills library.`
 
 **Using a standard Gemini model without skill-saving tools?**  
-Click **Code → Download ZIP** on this repository, extract it, and upload `skill-lifecycle-guardian/` and `gemini-skill-factory/` in **Gemini → Skills Manager**.
+1. Click **Code → Download ZIP** on this repository and extract it.
+2. Compress `skill-lifecycle-guardian/` and `gemini-skill-factory/` into **two separate `.zip` files** (each `.zip` must contain one skill folder with `SKILL.md` inside it).
+3. Upload each `.zip` in **Gemini → Skills Manager**.
 
 ---
 
