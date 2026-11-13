@@ -1,17 +1,17 @@
 {
   "schema_version": "1.0",
-  "repo": "ronot-creator/gemini-skills",
+  "repo": "ronot-creator/gemini-skills-optimizer",
   "branch": "main",
-  "updated_at": "2026-11-13T19:54:00Z",
-  "raw_base": "https://raw.githubusercontent.com/ronot-creator/gemini-skills/main",
+  "updated_at": "2026-11-13T20:02:00Z",
+  "raw_base": "https://raw.githubusercontent.com/ronot-creator/gemini-skills-optimizer/main",
   "skills": {
     "gemini-skill-factory": {
       "version": "2.3.1",
       "entry": "SKILL.md",
       "files": {
         "SKILL.md": {
-          "sha256_lf": "96c01c764818cd2d87401e5d011c431cdc1ac496efe55dab5677a14a79687a36",
-          "bytes": 13612
+          "sha256_lf": "1df46aa2e62298dd56ea210cc362475d9b69a686263bc7a09f3d653d3abf919b",
+          "bytes": 13662
         },
         "scripts/audit_repo_zip.py": {
           "sha256_lf": "90c6ab44aa77f66f1b6c40c2e8ef696cb63b8a7bd1a3b7a07ab49d3da09871a8",
@@ -25,8 +25,8 @@
       "entry": "SKILL.md",
       "files": {
         "SKILL.md": {
-          "sha256_lf": "2bf738b5db7ebcc2be42ce3f92bee4ff3aac98365288b929023390e71d2ed1e4",
-          "bytes": 8430
+          "sha256_lf": "f918c88233b799a1b657f5ef13af82220ef691ea6ce6e03cd0642c3a47c05fbb",
+          "bytes": 8470
         },
         "references/per-turn-snapshot-architecture.md": {
           "sha256_lf": "a65a8901d3fdc76cb2f81d24b82af8626637644cd7130da0a7dc567f050ae303",

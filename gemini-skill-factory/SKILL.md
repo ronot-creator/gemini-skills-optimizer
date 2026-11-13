@@ -1,6 +1,6 @@
 ---
 name: gemini-skill-factory
-description: Inspect, audit, cross-reference, convert, create, enhance, and self-update Gemini Skills from GitHub repository URLs, npx skills commands, Google Drive ZIP archives, or uploaded files. Supports low-token fleet self-updating via ronot-creator/gemini-skills manifest.json with hash-diff lazy pulls and automatically executes skill-lifecycle-guardian for zero-loss multi-file updates.
+description: Inspect, audit, cross-reference, convert, create, enhance, and self-update Gemini Skills from GitHub repository URLs, npx skills commands, Google Drive ZIP archives, or uploaded files. Supports low-token fleet self-updating via ronot-creator/gemini-skills-optimizer manifest.json with hash-diff lazy pulls and automatically executes skill-lifecycle-guardian for zero-loss multi-file updates.
 allowed-tools: drive default_api skills google
 ---
 # Gemini Skill Factory (v2.3.1)
@@ -12,7 +12,7 @@ Automate the discovery, static security and malware screening, Gemini compatibil
 - The user provides a **GitHub repository URL** (e.g., `https://github.com/<owner>/<repo>`, a subdirectory/tree URL `https://github.com/<owner>/<repo>/tree/<branch>/<path>`, a raw file URL, or `npx skills add <owner>/<repo>`) and asks to inspect it, import skills from it, or create a new skill based on that repository.
 - The user provides or points to a `.zip` archive in Google Drive or uploads a repository archive containing one or more skills or reference docs.
 - The user references numerical IDs or skill names from a previous Gemini Skill Factory inspection report to import or enhance specific skills.
-- The user invokes `@gemini-skill-factory` and asks to **check for updates**, **update skills**, or **sync with the official `ronot-creator/gemini-skills` repository** (Mode D).
+- The user invokes `@gemini-skill-factory` and asks to **check for updates**, **update skills**, or **sync with the official `ronot-creator/gemini-skills-optimizer` repository** (Mode D).
 
 ## General Operating Principles
 
@@ -23,7 +23,7 @@ Automate the discovery, static security and malware screening, Gemini compatibil
 - **Static Inspection Only**: Never execute untrusted external scripts simply to inspect them. Inspect all retrieved scripts and files statically.
 - **Prioritize Quality and Preservation Over Replacement**: Prefer enhancing existing skills (`Categories B & D`) over creating duplicates, and never downgrade or remove useful instructions or reference files from an existing skill.
 
-## Mode D: Low-Token Self-Updating & Fleet Sync (`ronot-creator/gemini-skills`)
+## Mode D: Low-Token Self-Updating & Fleet Sync (`ronot-creator/gemini-skills-optimizer`)
 
 To keep token usage near zero on normal conversations while giving non-technical users a seamless, one-step update path for `gemini-skill-factory` and `skill-lifecycle-guardian`:
 
@@ -31,11 +31,11 @@ To keep token usage near zero on normal conversations while giving non-technical
    - Do **not** poll GitHub on unrelated turns. Run this check only when the user explicitly asks to check/update skills OR when `@gemini-skill-factory` is invoked for a skill operation.
 2. **Single-Pointer Manifest Check (`O(1)` Token Cost)**:
    - Fetch ONLY the lightweight fleet manifest via `google:browse`:
-     `https://raw.githubusercontent.com/ronot-creator/gemini-skills/main/manifest.json`
+     `https://raw.githubusercontent.com/ronot-creator/gemini-skills-optimizer/main/manifest.json`
    - Compare the remote `version` and per-file `sha256_lf` hashes for `gemini-skill-factory` and `skill-lifecycle-guardian` against the local installed files using `scripts/audit_repo_zip.py --hash-dir`.
    - **Short-Circuit**: If all installed versions and `sha256_lf` hashes match, stop immediately (`0` extra fetches) and confirm everything is up to date.
 3. **Delta-Only Fetch & Anti-Torn-Read Verification (`O(Delta)` Cost)**:
-   - Fetch **only** files whose `sha256_lf` differs from the local copy via `google:browse` from `https://raw.githubusercontent.com/ronot-creator/gemini-skills/<ref>/<skill>/<path>` (preferring `commit_sha` if pinned in `manifest.json`, otherwise `main`).
+   - Fetch **only** files whose `sha256_lf` differs from the local copy via `google:browse` from `https://raw.githubusercontent.com/ronot-creator/gemini-skills-optimizer/<ref>/<skill>/<path>` (preferring `commit_sha` if pinned in `manifest.json`, otherwise `main`).
    - Stage the updated files in `/tmp/skill_factory_update/<skill>/` alongside unchanged local files, then run static security + integrity verification:
      ```bash
      python3 /working_dir/<conversation_id>/skills/user/gemini-skill-factory/scripts/audit_repo_zip.py \
@@ -55,7 +55,7 @@ To keep token usage near zero on normal conversations while giving non-technical
    - **Mode C - Inspection Only (DEFAULT)**: Use when a GitHub repo or ZIP is provided without an explicit command to immediately create/install.
    - **Mode A - Batch Import / Direct Creation**: Use when the user explicitly asks to create, install, or batch-import the skill(s) from the GitHub URL or archive.
    - **Mode B - Selective Import**: Use when the user selects specific skills by numerical ID (`1, 4, 7-10`), exact skill name, unambiguous partial name, or combinations.
-   - **Mode D - Self-Update & Fleet Sync**: Use when checking for or applying updates from `ronot-creator/gemini-skills`.
+   - **Mode D - Self-Update & Fleet Sync**: Use when checking for or applying updates from `ronot-creator/gemini-skills-optimizer`.
 2. Ingest the source into `/tmp/skill_factory_extracted/<source_stem>/`:
    - **Route 1: GitHub Repository URL (`https://github.com/<owner>/<repo>...` or `npx skills add <owner>/<repo>`)**:
      - Because the sandbox VM has no direct outbound internet access (`git clone` and `curl` are blocked inside the VM), use Gemini's native web tools (`google:browse` and `google:search`) to inspect and fetch the repository:
