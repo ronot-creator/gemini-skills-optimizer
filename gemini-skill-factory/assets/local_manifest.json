@@ -1,0 +1,25 @@
+{
+  "skill": "gemini-skill-factory",
+  "repo": "ronot-creator/gemini-skill-factory",
+  "version": "3.0.0",
+  "entry": "SKILL.md",
+  "files": {
+    "SKILL.md": {
+      "sha256_lf": "4ee80fdb485cf70e2444edb53fa01448d45bc1135d4e21ab2f736d26d72469b5",
+      "bytes": 8897
+    },
+    "references/output_schemas.md": {
+      "sha256_lf": "9e6addd7b0b86827dadf4ed518349c437d423236ae38c780f8a26fcd5844d015",
+      "bytes": 2091
+    },
+    "references/transcoding_rules.md": {
+      "sha256_lf": "7e028e2c6aec2790299a4e113be0082c1c7549782b73e2816fedfaa690617e3f",
+      "bytes": 2802
+    },
+    "references/update_protocol.md": {
+      "sha256_lf": "854f1a4e223f6233890a5d4c6d28ae38d60d8ef2aadc1a442286cb4739418c05",
+      "bytes": 3085
+    }
+  },
+  "total_files": 4
+}

@@ -2,39 +2,48 @@
   "schema_version": "1.0",
   "repo": "ronot-creator/gemini-skill-factory",
   "branch": "main",
-  "updated_at": "2026-11-13T20:09:31Z",
+  "updated_at": "2026-11-14T09:26:00Z",
   "raw_base": "https://raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main",
+  "pure_markdown": true,
   "skills": {
     "gemini-skill-factory": {
-      "version": "2.4.0",
+      "version": "3.0.0",
       "entry": "SKILL.md",
       "files": {
         "SKILL.md": {
-          "sha256_lf": "cd2a914f816f84479e1ba593f9e81b6085daebd7b1d26a5550b88c3b31e3ee0c",
-          "bytes": 13754
+          "sha256_lf": "4ee80fdb485cf70e2444edb53fa01448d45bc1135d4e21ab2f736d26d72469b5",
+          "bytes": 8897
         },
-        "scripts/audit_repo_zip.py": {
-          "sha256_lf": "de3fc24af5ad25f86d3e464e6b1052def33a5abd6ab1a75a82254aea789e9455",
-          "bytes": 11199
+        "references/output_schemas.md": {
+          "sha256_lf": "9e6addd7b0b86827dadf4ed518349c437d423236ae38c780f8a26fcd5844d015",
+          "bytes": 2091
+        },
+        "references/transcoding_rules.md": {
+          "sha256_lf": "7e028e2c6aec2790299a4e113be0082c1c7549782b73e2816fedfaa690617e3f",
+          "bytes": 2802
+        },
+        "references/update_protocol.md": {
+          "sha256_lf": "854f1a4e223f6233890a5d4c6d28ae38d60d8ef2aadc1a442286cb4739418c05",
+          "bytes": 3085
         }
       },
-      "total_files": 2
+      "total_files": 4
     },
     "skill-lifecycle-guardian": {
-      "version": "1.3.0",
+      "version": "2.0.0",
       "entry": "SKILL.md",
       "files": {
         "SKILL.md": {
-          "sha256_lf": "fe177589ac8767b5bb40d30041ee8a76e17f2c8a018c0ca3dbc80f011a4512ac",
-          "bytes": 8587
+          "sha256_lf": "8cbc32f8029c71fb76052c89019f76efaea6f56065f826728253f80ca017d415",
+          "bytes": 4956
+        },
+        "references/lifecycle_rules.md": {
+          "sha256_lf": "05e1d5b5ca4a304908bfa3d2b1939c6822e7a5315a6ecdf862a1cb737ab7093a",
+          "bytes": 2705
         },
         "references/per-turn-snapshot-architecture.md": {
-          "sha256_lf": "a65a8901d3fdc76cb2f81d24b82af8626637644cd7130da0a7dc567f050ae303",
-          "bytes": 3550
-        },
-        "scripts/skill_sync.py": {
-          "sha256_lf": "c1039506e5d4737f9103f2728ebda466e90d96ec98ba57f58f8351d5f6ae4e2c",
-          "bytes": 4402
+          "sha256_lf": "e9a36360825fea2b2cfc19dde1733e6aaccd46c24be8cd1527a2778817c208c4",
+          "bytes": 1635
         }
       },
       "total_files": 3

@@ -1,4 +1,4 @@
-name: Validate Skills & Update Manifest
+name: Validate Pure-Markdown Skills & Update Manifest
 
 on:
   push:
@@ -19,10 +19,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Validate skill directories
+      - name: Enforce 100% Pure-Markdown (.md/.json only) & valid frontmatter
         run: |
-          python3 gemini-skill-factory/scripts/audit_repo_zip.py --validate gemini-skill-factory
-          python3 gemini-skill-factory/scripts/audit_repo_zip.py --validate skill-lifecycle-guardian
+          python3 - <<'PY'
+          import sys
+          from pathlib import Path
+
+          for skill in ("gemini-skill-factory", "skill-lifecycle-guardian"):
+              sdir = Path(skill)
+              skill_md = sdir / "SKILL.md"
+              assert skill_md.exists(), f"Missing {skill_md}"
+              txt = skill_md.read_text(encoding="utf-8")
+              assert txt.startswith("---\n"), f"{skill_md} missing YAML frontmatter"
+              entries = [p for p in sdir.rglob("*") if p.is_file()]
+              assert len(entries) + 5 <= 100, f"{skill} exceeds 100-entry limit"
+              for f in entries:
+                  assert f.suffix in (".md", ".json"), f"Forbidden executable/non-md/json file: {f}"
+          print("All pure-Markdown & frontmatter checks passed.")
+          PY
       - name: Regenerate manifest.json on main push
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
@@ -33,11 +47,8 @@ jobs:
 
           def sha256_lf(p: Path) -> str:
               raw = p.read_bytes()
-              try:
-                  t = raw.decode("utf-8").replace("\r\n", "\n").rstrip("\n") + "\n"
-                  return hashlib.sha256(t.encode("utf-8")).hexdigest()
-              except UnicodeDecodeError:
-                  return hashlib.sha256(raw).hexdigest()
+              text = raw.decode("utf-8").replace("\r\n", "\n").rstrip("\n") + "\n"
+              return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
           manifest = json.loads(Path("manifest.json").read_text(encoding="utf-8"))
           manifest["updated_at"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -45,14 +56,15 @@ jobs:
               sdir = Path(sname)
               files_meta = {}
               for f in sorted(sdir.rglob("*")):
-                  if f.is_file() and f.name != ".sync_manifest.json" and not f.name.startswith("."):
+                  if f.is_file() and not f.name.startswith("."):
                       rel = str(f.relative_to(sdir)).replace("\\", "/")
-                      if rel == "references/local_manifest.json":
+                      if rel == "assets/local_manifest.json":
                           continue
                       files_meta[rel] = {"sha256_lf": sha256_lf(f), "bytes": f.stat().st_size}
               sdata["files"] = files_meta
               sdata["total_files"] = len(files_meta)
-              (sdir / "references" / "local_manifest.json").write_text(
+              (sdir / "assets").mkdir(parents=True, exist_ok=True)
+              (sdir / "assets" / "local_manifest.json").write_text(
                   json.dumps({"skill": sname, "repo": manifest["repo"], **sdata}, indent=2) + "\n",
                   encoding="utf-8",
               )
@@ -60,6 +72,6 @@ jobs:
           PY
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add manifest.json */references/local_manifest.json
+          git add manifest.json */assets/local_manifest.json
           git diff --staged --quiet || git commit -m "chore: auto-sync manifest.json [skip ci]"
           git push

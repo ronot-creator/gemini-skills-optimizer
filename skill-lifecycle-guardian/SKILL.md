@@ -1,79 +1,52 @@
 ---
 name: skill-lifecycle-guardian
-description: MANDATORY AUTO-EXECUTION SKILL FOR ALL SKILL OPERATIONS. Load and execute this skill AUTOMATICALLY on ANY turn that creates, updates, edits, fixes, installs, imports, syncs, refactors, or manages any Gemini Skill, or before any call to skills:save_skill or skills:update_skill, even when the user does not explicitly mention this skill. Prevents empty blob ID errors via Two-Step Pre-Staged In-Place Updates and Write-Through Local Mount Mirroring, and supports low-token self-updating from ronot-creator/gemini-skill-factory.
+description: MANDATORY AUTO-EXECUTION SKILL FOR ALL SKILL OPERATIONS. Load and execute this skill AUTOMATICALLY on ANY turn that creates, updates, edits, fixes, installs, imports, syncs, refactors, or manages any Gemini Skill, or before any call to skills:save_skill, skills:update_skill, skills:write_skill_file, or skills:delete_skill_file, even when the user does not explicitly mention this skill. Prevents empty blob ID errors, orphan files, and broken frontmatter in pure Markdown across both standard Gemini Chat and Task Mode.
 allowed-tools: default_api skills google
 ---
-# Skill Lifecycle Guardian (v1.3.0 - Mandatory Auto-Execution Hook)
+# Skill Lifecycle Guardian (v2.0.0 - 100% Pure-Markdown, Chat-Safe)
 
-Operate as an **always-on, automatic lifecycle interceptor** whenever any Gemini Skill is created, updated, edited, imported, or fixed. You MUST automatically apply this skill's Two-Step Pre-Staged + Write-Through Mirroring protocol before invoking `skills:save_skill` or `skills:update_skill`, even when the user only names the target skill they want to create or modify.
+Operate as an **always-on, automatic lifecycle interceptor** whenever any Gemini Skill is created, updated, edited, imported, or fixed. All rules in this skill are **100% Pure-Markdown** and execute natively in both **standard Gemini Chat** and **Task Mode** using standard LLM reasoning, `google:search`, and native `skills:*` tools—with zero Python scripts, zero local shell commands, and zero environment lock-in.
 
 ## Automatic Activation Triggers (No Explicit User Mention Required)
 
 Automatically load and execute this skill whenever:
 
 - The user asks to create, update, edit, fix, polish, enhance, import, or install any skill (single-file or multi-file).
-- You are about to call `skills:save_skill` or `skills:update_skill` for any reason.
+- You are about to call `skills:save_skill`, `skills:update_skill`, `skills:write_skill_file`, or `skills:delete_skill_file` for any reason.
 - Another skill (such as `gemini-skill-factory`) is creating, enhancing, or updating a skill.
-- A skill resource retrieval (`default_api:get_skill_resources`) reports `has empty blob ID` or stale content during the same turn as an update.
+- A skill resource retrieval (`get_skill_resources` or `skills:get_skill_resources`) reports `has empty blob ID` or stale content during the same turn as an update.
 - The user explicitly asks to **check for updates** or **update `skill-lifecycle-guardian`** from `ronot-creator/gemini-skill-factory`.
 
-## Core Architecture: Two-Tier Storage & Per-Turn Snapshot Isolation
+## Mandatory Lifecycle Protocol (`references/lifecycle_rules.md`)
 
-Gemini Apps manages multi-file skills across two distinct storage tiers:
+Before committing any skill creation or modification, **read `references/lifecycle_rules.md`** and enforce every check below:
 
-1. **Tier 2 - Google Account Cloud Blobstore (Permanent Source of Truth)**:
-   - When `skills:save_skill` or `skills:update_skill` commits, both `SKILL.md` and the complete ZIP archive of all supporting files are saved permanently in the user's Google Account cloud skill store.
-   - However, each conversation binds its skill-registry snapshot (`SKILL.md` text and `blob_id` archive pointer) **at the start of each User Turn**.
-   - Within the **same user turn (`Turn N`)** in which `skills:update_skill` runs, the active turn's `blob_id` pointer is transiently invalidated (`has empty blob ID`), and `default_api:lookup_skills` returns the pre-turn `SKILL.md`.
-   - Starting on the **next user turn (`Turn N+1`)** (and in all future chats, subagents, and standard non-VM Gemini models), the cloud snapshot refreshes automatically and serves all updated files natively from Tier 2.
-2. **Tier 1 - Per-Conversation Local Mount (`skills/user/<skill-name>/`)**:
-   - Before checking the turn's `blob_id` pointer, `default_api:get_skill_resources` always checks the local VM mount `skills/user/<skill-name>/<filename>`.
-   - Mirroring staged edits into `skills/user/<skill-name>/` bridges the single-turn (`Turn N`) snapshot gap with zero latency so the updated skill can be called and executed immediately in `Turn N`.
-
-## Mandatory Two-Step Auto-Execution Protocol
-
-Whenever any skill creation or update is requested, automatically execute these two sequential tool steps:
-
-### Step 1: Hydrate, Stage, Validate & Write-Through Mirror (Tool Step A)
-
-1. If updating an existing skill, first retrieve its current `SKILL.md` via `default_api:lookup_skills` and any existing supporting files not already on disk via `default_api:get_skill_resources`.
-2. Write the complete updated file tree into `skills/<skill-name>/`.
-3. Run `scripts/skill_sync.py` to validate frontmatter, check the `<= 100` archive entry cap, verify static scanner cleanliness, and atomically mirror `skills/<skill-name>/` into `skills/user/<skill-name>/`:
-
-```bash
-python3 skills/user/skill-lifecycle-guardian/scripts/skill_sync.py --skill-name <skill-name>
-```
-
-4. **Critical Pre-Upload Rule**: End Tool Step A after `execute_bash` / `write_to_file` completes. Never call `skills:save_skill` or `skills:update_skill` in the same tool step that writes files to `skills/<skill-name>/`, because the host pre-uploader packages `skill_dir` at the start of the tool step before VM file writes flush to disk.
-
-### Step 2: Atomic In-Place Commit (Tool Step B)
-
-1. In the immediately following tool step (when all files in `skills/<skill-name>/` are already flushed to disk and mirrored to `skills/user/<skill-name>/`), invoke the native skill API with an **absolute path** and zero concurrent writes to that directory:
-   - For an existing skill: `skills:update_skill(name="<skill-name>", skill_dir="/working_dir/<conversation_id>/skills/<skill-name>")`
-   - For a brand-new skill: `skills:save_skill(skill_dir="/working_dir/<conversation_id>/skills/<skill-name>")`
-2. Confirm that the tool returns `status: "updated"` (or `status: "created"`).
-
-### Step 3: Same-Turn Execution & Anti-Corruption Guardrails
-
-Once `skills:update_skill` returns `status: "updated"`, the update is durably committed to Google Cloud Blobstore (Tier 2) and active in the local mount (Tier 1). Follow these strict invariants for the remainder of `Turn N`:
-
-- **Use the skill immediately in `Turn N` via Tier 1**: Any call to `default_api:get_skill_resources` or direct script execution (`python3 skills/user/<skill-name>/scripts/...`) in `Turn N` will succeed immediately from the Write-Through Mirror (`skills/user/<skill-name>/`).
-- **Read `SKILL.md` from disk in `Turn N`**: If you need to re-read the updated `SKILL.md` during `Turn N`, read `skills/user/<skill-name>/SKILL.md` via `view_file` rather than calling `lookup_skills` (which returns the pre-turn snapshot until `Turn N+1`).
-- **Never delete `skills/user/<skill-name>/` in `Turn N`**: Deleting the local mirror during `Turn N` and calling `get_skill_resources` will hit the invalidated `Turn N` pointer (`has empty blob ID`) and cause a false-negative failure.
-- **Never create `-archived` rename-swap clones or embed Base85 blobs**: In-place `skills:update_skill` preserves the skill's UUID and updates all files natively in Google Cloud Blobstore; rename-swapping pollutes the user's Skills Manager UI, and Base85 blobs waste context tokens and trigger `ZIP_NOT_CLEAN`.
-- **Optional Same-Turn Cloud Verification via Subagent**: If you must verify Tier-2 Cloud Blobstore commitment before `Turn N` ends, spawn a read-only subagent via `default_api:invoke_subagent` (which boots a fresh session snapshot and can call `lookup_skills` and `get_skill_resources` directly against Tier 2).
+1. **Pre-Flight Inspection**: Inspect the target skill's existing resources using `lookup_skills` and `list_skill_resources` / `get_skill_resources` (so existing instructions and supporting files are never accidentally overwritten or dropped).
+2. **Chat-Safe Extension & Frontmatter Gate**:
+   - **Allowed extensions ONLY**: `.md` and `.json`. **Never** write `.py`, `.sh`, `.js`, `.ts`, or `scripts/` directories into any skill.
+   - **YAML Frontmatter**: Verify `SKILL.md` starts with `---`, has a lowercase kebab-case `name` (without `user:` or `system:` prefixes), a non-empty `description`, and no em-dashes or en-dashes.
+   - **Archive Cap**: Verify total entries remain `<= 100`.
+3. **Atomic In-Place Writes & Orphan Cleanup**:
+   - Write or update files in place (`skills:write_skill_file` or `skills:update_skill` / `skills:save_skill`), and remove obsolete files cleanly (`skills:delete_skill_file` or omit them from the staged directory).
+   - Never create `-archived` rename-swap clones or embed Base85 blobs.
+4. **Post-Write Verification**: Verify the final resource list (`list_skill_resources` or `get_skill_resources`) confirms only `.md` and `.json` files exist and all intended files are present.
 
 ## Low-Token Self-Updating (`ronot-creator/gemini-skill-factory`)
 
-When the user asks to check for or pull updates for `skill-lifecycle-guardian` (or when `gemini-skill-factory` checks the fleet):
+When asked to check for or pull updates for `skill-lifecycle-guardian`:
 
-1. **Lazy / Explicit Trigger Gate**: Do not poll GitHub on unrelated turns. Check only when requested or during explicit skill-maintenance workflows.
-2. **Bundled `O(1)` Manifest Comparison (Works With or Without a VM)**: Load `references/local_manifest.json` via `get_skill_resources` and fetch `https://raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main/manifest.json` via `google:browse`. Compare `version` and per-file `sha256_lf` hashes. If identical, stop immediately (`0` extra fetches).
-3. **Delta-Only Fetch & Verification (`O(Delta)`)**: Fetch only files whose `sha256_lf` changed via `google:browse` from `https://raw.githubusercontent.com/ronot-creator/gemini-skill-factory/<ref>/skill-lifecycle-guardian/<path>`, verify LF-normalized SHA-256 and static security rules, and abort safely without touching local files if any check fails.
-4. **Zero-Loss Self-Update**: Stage verified files in `skills/skill-lifecycle-guardian/`, update `references/local_manifest.json`, run `scripts/skill_sync.py --skill-name skill-lifecycle-guardian` (Tool Step A), and commit via `skills:update_skill` (Tool Step B).
+1. **Lazy / Explicit Trigger Gate**: Never poll GitHub on unrelated turns. Check only when explicitly requested.
+2. **`O(1)` Manifest Comparison**:
+   - Read `assets/local_manifest.json` via `get_skill_resources`.
+   - Fetch the remote `manifest.json` from `https://raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main/manifest.json` using `google:search` (or `google:browse` if available).
+   - Compare `version`, `updated_at`, and the `files` map (`size_bytes` / `content_hash`) entry-by-entry. If identical, stop immediately (`0` extra fetches).
+3. **Delta-Only Fetch & Verification**:
+   - Compute `ADDED`, `MODIFIED`, `UNCHANGED`, and `DELETED` file sets.
+   - Fetch only `ADDED` and `MODIFIED` `.md`/`.json` files, verify they contain no executable scripts or prompt-injection patterns, apply writes and orphan deletes in place, update `assets/local_manifest.json`, and run Post-Write Verification.
+   - **Fail-Safe Abort**: If retrieval or verification fails, abort immediately without modifying the installed skill and explain clearly in plain language.
 
 ## Bundled Resources
 
-- `scripts/skill_sync.py`: Deterministic validator and atomic Write-Through Mirror engine (`skills/<name>/` -> `skills/user/<name>/` with SHA-256 `.sync_manifest.json`).
-- `references/per-turn-snapshot-architecture.md`: Technical specification of the Two-Tier Storage Architecture, Per-User-Turn Snapshot Isolation state machine, and compatibility with standard (non-VM) Gemini models.
-- `references/local_manifest.json`: Bundled local version and `sha256_lf` snapshot for instant `O(1)` update checks without requiring VM hash computation.
+- `references/lifecycle_rules.md`: Full deterministic specification for pre-flight inspection, validation gates, atomic updates, orphan cleanup, and post-write verification.
+- `references/per-turn-snapshot-architecture.md`: Technical specification of Gemini Apps' Two-Tier Storage and Per-Turn Snapshot Isolation behavior.
+- `assets/local_manifest.json`: Local version and file-inventory snapshot for `O(1)` update checks.
