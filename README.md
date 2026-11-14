@@ -22,7 +22,7 @@ Copy and paste this single prompt into Gemini:
 
 | Skill | Version | What It Does |
 | :--- | :--- | :--- |
-| **`gemini-skill-factory`** | `3.2.0` | Discovers skills autonomously (`Mode E`), synthesizes Pure-Markdown skills from **4 sources**, runs security & portability checks, consolidates split/megarepo skills (`O(N)` Mergeability + Sharded Mega-Skills), installs, and self-updates. |
+| **`gemini-skill-factory`** | `3.2.0` | Discovers skills autonomously (`Mode E`), synthesizes Pure-Markdown skills from **4 sources**, runs security & portability checks, cross-references existing skills (`Categories A–E`), consolidates split/megarepo skills (`O(N)` Mergeability + Sharded Mega-Skills), installs, and self-updates. |
 | **`skill-lifecycle-guardian`** | `2.0.0` | Prevents multi-file skill corruption, empty blob IDs, broken frontmatter, and orphan files across both standard Gemini Chat and Task Mode. |
 
 ---
@@ -31,11 +31,31 @@ Copy and paste this single prompt into Gemini:
 
 | Mode | Trigger | What It Does |
 | :--- | :--- | :--- |
-| **Mode C — Inspection Only (Default)** | `@gemini-skill-factory <GitHub URL or ZIP>` | Fetches metadata first, runs security + portability + mergeability checks, and prints a numbered **Inspection Report (`#1..#N`)** before installing anything. |
-| **Mode A — Batch Import / Direct Creation** | `@gemini-skill-factory create a skill from <source>` or `batch import` | Runs all security/portability/mergeability checks and immediately creates/updates all compatible skills in the same turn. |
+| **Mode C — Inspection Only (Default)** | `@gemini-skill-factory <GitHub URL or ZIP>` | Fetches metadata first, runs security + portability + mergeability + overlap checks, and prints a numbered **Inspection Report (`#1..#N`)** before installing anything. |
+| **Mode A — Batch Import / Direct Creation** | `@gemini-skill-factory create a skill from <source>` or `batch import` | Runs all security/portability/mergeability/overlap checks and immediately creates/updates all compatible skills in the same turn. |
 | **Mode B — Selective Import** | `Import #1, #3, and 5-7` (or by skill name) | Installs or merges only the specific items you choose from an inspection or discovery report. |
 | **Mode D — Low-Token Self-Update** | `@gemini-skill-factory check for updates` | Compares `assets/local_manifest.json` against `manifest.json` (`O(1)`), pulls only changed `.md`/`.json` files (`O(Delta)`), and updates in place. |
 | **Mode E — Autonomous Skill Discovery** | `@gemini-skill-factory find me a skill for <goal>` | Searches [`skills.sh`](https://skills.sh/) and GitHub, fetches and verifies raw `SKILL.md` files (never from snippets alone), and presents ranked candidates. |
+
+### Mode B Selection Syntax
+When replying to an Inspection or Discovery Report, you can select items using:
+- **Ranges:** `#1-3` or `1-3`
+- **Single IDs:** `#2` or `2`
+- **Exact Names or Unique Substrings:** e.g., `Import #1, quiz-generator, and 5-7`
+
+---
+
+## Overlap Categories (`A–E`) in Inspection & Discovery Reports
+
+Every candidate skill is cross-referenced against your already-installed Gemini Skills library and assigned one of five overlap categories:
+
+| Category | Meaning | Default Action |
+| :---: | :--- | :--- |
+| **`A`** | **Entirely New Capability** — No overlapping skill exists in your library. | Creates a new standalone skill (or Sharded Mega-Skill). |
+| **`B`** | **Complementary Additions** — Matches an existing skill and adds useful new workflows/rules. | Merges the new capabilities into your existing skill without deleting original instructions. |
+| **`C`** | **Existing Skill is Superior** — Your installed skill already covers this better or more completely. | **Skipped** (preserves your stronger local skill). |
+| **`D`** | **Substantial Functional Overlap** — Heavy overlap with an existing skill, with a few non-redundant extras. | Merges only the non-redundant additions into the stronger existing skill. |
+| **`E`** | **Inferior or Redundant** — Exact duplicate or lower quality than what you already have. | **Skipped** to prevent library bloat. |
 
 ---
 
@@ -46,11 +66,22 @@ Copy and paste this single prompt into Gemini:
 1. **Source 1 — Pre-Packaged Skill / Agent Repos & Archives**: Imports existing `SKILL.md`, `.claude/commands/*.md`, `.cursorrules`, `npx skills add <owner>/<repo>`, or Google Drive / uploaded `.zip` packages.
 2. **Source 2 — General Codebases & Technical Docs**: Distills any regular GitHub repository's `README.md`, architecture docs, and CLI/API specs into a clean Gemini Skill.
 3. **Source 3 — Generic Material**: Converts unstructured prompts, rubrics, SOPs, study guides, checklists, or notes into deterministic `SKILL.md` + `references/` workflows.
-4. **Source 4 — Conversational Experience & Retrospectives (Explicit Gate)**: Distills verified bug fixes, edge cases, and safety nets discovered during a chat session into a new skill or targeted patch—always presenting a tiny human-readable **Retrospective Patch Preview** for your `Apply` confirmation before editing any `SKILL.md`.
+4. **Source 4 — Conversational Experience & Retrospectives (Explicit Gate)**: Distills verified bug fixes, edge cases, and safety nets discovered during a chat session into a new skill or targeted patch—always presenting a short, plain-Markdown **Retrospective Patch Preview** (`Target Skill`, `Observed Issue`, and `1–5 line Proposed Addition`) and waiting for your `Apply` confirmation before editing any `SKILL.md`.
 
 ### Ecosystem Discovery & Attribution
 
 Mode E autonomous discovery is inspired by and credits Vercel's open agent-skills ecosystem, [`vercel-labs/skills`](https://github.com/vercel-labs/skills) and [`skills.sh`](https://skills.sh/). You can also point `gemini-skill-factory` directly at `https://github.com/vercel-labs/skills` to synthesize your own Pure-Markdown `find-skills` skill.
+
+---
+
+## Security Gate, Portability Linter & Script Transcoding
+
+1. **Static Security & Malware Gate (`references/transcoding_rules.md`)**:
+   - Automatically marks **`Rejected (Security)`** any candidate containing `eval(`, `exec(`, `subprocess.Popen(...shell=True)`, `curl ... | sh` or `| bash`, destructive commands (`rm -rf /`, credential harvesting, token exfiltration), or prompt-injection patterns (`ignore previous instructions`, hidden overrides).
+2. **Claude-to-Gemini Portability Linter**:
+   - Automatically flags **`Requires Modification`** when an upstream skill uses Claude tool syntax (`Bash`, `WebFetch`, `TodoWrite`, `Skill tool`), Claude config paths (`~/.claude`, `.claude/`, `CLAUDE.md`), external MCP servers (`fastmcp`, `stdio`), or local OS dependencies (`docker`, `tmux`, `systemctl`, `brew`, `apt-get`), and adapts them to native Gemini workflows.
+3. **Chat-Safe Script Transcoding**:
+   - Any `.py`, `.sh`, `.js`, or `.ts` files in an upstream repo are automatically transcoded into readable `references/<script_name>_spec.md` specifications (`<= 100` entries, `.md` and `.json` only) so every installed skill runs in standard Gemini Chat.
 
 ---
 
@@ -64,8 +95,6 @@ To prevent token waste and skill-library clutter when importing multi-file or 50
    - Clusters scoring **`6–10`** are automatically merged into one clean `SKILL.md` + namespaced `references/*.md`.
 2. **Sharded Mega-Skill Synthesis (`>= 4` Distinct Skills, `>= 70%` Domain Cohesion)**:
    - When a repository contains 4+ distinct skills in one cohesive domain (e.g., 50 video skills or 30 coding skills), it compiles them into **one Sharded Mega-Skill** (`SKILL.md` router + `catalogue/index.json` + lazy-loaded `references/shard-*.md` under `<= 90` total entries)—preventing Skills Manager overpopulation.
-3. **Chat-Safe Script Transcoding (`references/transcoding_rules.md`)**:
-   - Any `.py`, `.sh`, `.js`, or `.ts` files in an upstream repo are automatically transcoded into readable `references/<script_name>_spec.md` specifications so every installed skill runs in standard Gemini Chat.
 
 ### How to Control or Override Consolidation Upfront
 
