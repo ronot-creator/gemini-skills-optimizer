@@ -1,6 +1,6 @@
 # Exact Output Schemas & Templates
 
-You MUST reproduce these exact section headers, metadata blocks, and table columns when presenting inspection or operation results. Never expose `user:` or `system:` prefixes in user-facing output.
+You MUST reproduce these exact section headers, metadata blocks, and table columns when presenting inspection, discovery, retrospective, or operation results. Never expose `user:` or `system:` prefixes in user-facing output.
 
 ## Schema 1: Standardized Inspection Report (Step 4)
 
@@ -8,7 +8,7 @@ You MUST reproduce these exact section headers, metadata blocks, and table colum
 ### Standardized Inspection Report
 
 * **Summary Metrics**: **<TOTAL>** skills discovered | **<COMPAT_DIRECT>** directly compatible | **<COMPAT_MOD>** requiring adaptation/transcoding | **<REJECTED>** rejected
-* **Source**: `<GitHub URL or Archive Name>`
+* **Source**: `<GitHub URL, Archive Name, Generic Material, or Chat Retrospective>`
 
 | # | Skill Name | Functionality & Primary Use Cases | Supporting Files & Dependencies | Compatibility & Portability | Security Inspection | Overlap Category |
 | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -39,3 +39,33 @@ You MUST reproduce these exact section headers, metadata blocks, and table colum
 * **<skill-name>**: `v<local>` -> `v<remote>` (`Up to date` / `Updated` / `Aborted cleanly - local copy intact`)
 * **File Diff Summary**: `ADDED`: <count> | `MODIFIED`: <count> | `DELETED`: <count> | `UNCHANGED`: <count>
 ```
+
+## Schema 4: Mode E Autonomous Discovery Report
+
+```markdown
+### Autonomous Skill Discovery Report (Mode E)
+
+* **Goal**: `<user capability goal>`
+* **Discovery Sources**: [`skills.sh`](https://skills.sh/) & GitHub (inspired by [`vercel-labs/skills`](https://github.com/vercel-labs/skills)) — raw `SKILL.md` verified
+
+| # | Candidate Skill | Source Repo / URL | Summary & Fit | Security & Portability | Overlap Category |
+| :---: | :--- | :--- | :--- | :--- | :--- |
+| **#1** | `<kebab-name>` | `[<owner/repo>](<URL>)` | <concise fit summary> | `Passed` / `Requires Transcoding` | `<A/B/C/D/E>` |
+```
+
+* **Mode E Footer**:
+  > Reply with **Import #1** (or numbers/names) to transcode and install, or **Batch Import** to consolidate compatible matches.
+
+## Schema 5: Source 4 Retrospective Patch Preview (Explicit Gate)
+
+```markdown
+### Retrospective Skill Update Proposal
+
+* **Target Skill**: `<skill-name>` (`New Skill` / `Update v<current>`)
+* **Observed Issue / Lesson**: <concise root-cause summary from conversation>
+* **Proposed Pure-Markdown Addition**:
+  > <1–5 concise, verified lines to add to `SKILL.md` or `references/`>
+```
+
+* **Retrospective Footer**:
+  > Reply **Apply** to persist this update via `skill-lifecycle-guardian`, or specify edits.

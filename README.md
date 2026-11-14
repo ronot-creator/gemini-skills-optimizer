@@ -1,6 +1,6 @@
 # Gemini Skill Factory
 
-**100% Pure-Markdown, Chat-Safe package manager, skill compiler, and update guard for Gemini Apps skills.**  
+**100% Pure-Markdown, Chat-Safe package manager, universal 4-source skill compiler, autonomous skill discoverer, and update guard for Gemini Apps skills.**  
 Works identically in **standard Gemini Chat** and **Task Mode**—with zero `.py`/`.sh`/`.js` scripts, zero terminal setup, and zero external MCP dependencies.
 
 ---
@@ -22,7 +22,7 @@ Copy and paste this single prompt into Gemini:
 
 | Skill | Version | What It Does |
 | :--- | :--- | :--- |
-| **`gemini-skill-factory`** | `3.1.0` | Inspects, security-scans, lints Claude-to-Gemini portability, transcodes scripts to pure Markdown, consolidates split/megarepo skills (`O(N)` Mergeability + Sharded Mega-Skills), installs, and self-updates. |
+| **`gemini-skill-factory`** | `3.2.0` | Discovers skills autonomously (`Mode E`), synthesizes Pure-Markdown skills from **4 sources**, runs security & portability checks, consolidates split/megarepo skills (`O(N)` Mergeability + Sharded Mega-Skills), installs, and self-updates. |
 | **`skill-lifecycle-guardian`** | `2.0.0` | Prevents multi-file skill corruption, empty blob IDs, broken frontmatter, and orphan files across both standard Gemini Chat and Task Mode. |
 
 ---
@@ -32,17 +32,29 @@ Copy and paste this single prompt into Gemini:
 | Mode | Trigger | What It Does |
 | :--- | :--- | :--- |
 | **Mode C — Inspection Only (Default)** | `@gemini-skill-factory <GitHub URL or ZIP>` | Fetches metadata first, runs security + portability + mergeability checks, and prints a numbered **Inspection Report (`#1..#N`)** before installing anything. |
-| **Mode A — Batch Import / Direct Creation** | `@gemini-skill-factory create a skill from <URL>` or `batch import` | Runs all security/portability/mergeability checks and immediately creates/updates all compatible skills in the same turn. |
-| **Mode B — Selective Import** | `Import #1, #3, and 5-7` (or by skill name) | Installs or merges only the specific items you choose from an inspection report. |
+| **Mode A — Batch Import / Direct Creation** | `@gemini-skill-factory create a skill from <source>` or `batch import` | Runs all security/portability/mergeability checks and immediately creates/updates all compatible skills in the same turn. |
+| **Mode B — Selective Import** | `Import #1, #3, and 5-7` (or by skill name) | Installs or merges only the specific items you choose from an inspection or discovery report. |
 | **Mode D — Low-Token Self-Update** | `@gemini-skill-factory check for updates` | Compares `assets/local_manifest.json` against `manifest.json` (`O(1)`), pulls only changed `.md`/`.json` files (`O(Delta)`), and updates in place. |
-
-**Two Supported Source Types:**
-- **Type 1A (Pre-Packaged Skill / Agent Repos)**: Imports existing `SKILL.md`, `.claude/commands/*.md`, or `.cursorrules` packages.
-- **Type 1B (General Codebases & Docs Repos)**: Distills any regular GitHub repository's `README.md`, architecture docs, and CLI/API specs into a brand-new Gemini Skill.
+| **Mode E — Autonomous Skill Discovery** | `@gemini-skill-factory find me a skill for <goal>` | Searches [`skills.sh`](https://skills.sh/) and GitHub, fetches and verifies raw `SKILL.md` files (never from snippets alone), and presents ranked candidates. |
 
 ---
 
-## Smart Consolidation & Mega-Skill Synthesis (`v3.1.0`)
+## Universal 4-Source Skill Synthesis (`v3.2.0`)
+
+`gemini-skill-factory` synthesizes 100% Pure-Markdown skills from four distinct source types:
+
+1. **Source 1 — Pre-Packaged Skill / Agent Repos & Archives**: Imports existing `SKILL.md`, `.claude/commands/*.md`, `.cursorrules`, `npx skills add <owner>/<repo>`, or Google Drive / uploaded `.zip` packages.
+2. **Source 2 — General Codebases & Technical Docs**: Distills any regular GitHub repository's `README.md`, architecture docs, and CLI/API specs into a clean Gemini Skill.
+3. **Source 3 — Generic Material**: Converts unstructured prompts, rubrics, SOPs, study guides, checklists, or notes into deterministic `SKILL.md` + `references/` workflows.
+4. **Source 4 — Conversational Experience & Retrospectives (Explicit Gate)**: Distills verified bug fixes, edge cases, and safety nets discovered during a chat session into a new skill or targeted patch—always presenting a tiny human-readable **Retrospective Patch Preview** for your `Apply` confirmation before editing any `SKILL.md`.
+
+### Ecosystem Discovery & Attribution
+
+Mode E autonomous discovery is inspired by and credits Vercel's open agent-skills ecosystem, [`vercel-labs/skills`](https://github.com/vercel-labs/skills) and [`skills.sh`](https://skills.sh/). You can also point `gemini-skill-factory` directly at `https://github.com/vercel-labs/skills` to synthesize your own Pure-Markdown `find-skills` skill.
+
+---
+
+## Smart Consolidation & Mega-Skill Synthesis (`v3.1.0+`)
 
 To prevent token waste and skill-library clutter when importing multi-file or 50–100+ skill repositories, `gemini-skill-factory` uses a **Two-Axis Consolidation Engine** (`references/merge_strategy.md`):
 
@@ -82,6 +94,7 @@ You can steer or bypass the consolidation engine directly in your prompt:
 │   ├── SKILL.md
 │   ├── assets/local_manifest.json
 │   └── references/
+│       ├── discovery_and_synthesis.md
 │       ├── merge_strategy.md
 │       ├── output_schemas.md
 │       ├── transcoding_rules.md

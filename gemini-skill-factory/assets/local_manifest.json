@@ -1,20 +1,24 @@
 {
   "skill": "gemini-skill-factory",
   "repo": "ronot-creator/gemini-skill-factory",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "entry": "SKILL.md",
   "files": {
     "SKILL.md": {
-      "sha256_lf": "de39c8cc9fc9b6ed2cc6e73b4c2e511782b6ea8e39cf2777c1ae7c5303a2b607",
-      "bytes": 8958
+      "sha256_lf": "b4d548a0341ce5ee71de986176431fb83ce2e9f7de3ce35dae8697b3a3d4bf55",
+      "bytes": 9076
+    },
+    "references/discovery_and_synthesis.md": {
+      "sha256_lf": "71479d9fb41789da786585b6960717589c2fb6c399199ad5397856c2dd8a87eb",
+      "bytes": 4658
     },
     "references/merge_strategy.md": {
       "sha256_lf": "bd41cffdf432be1b8fd5faa654d93fdbd0006987a92c422bc27eac4488e453f5",
       "bytes": 4258
     },
     "references/output_schemas.md": {
-      "sha256_lf": "9e6addd7b0b86827dadf4ed518349c437d423236ae38c780f8a26fcd5844d015",
-      "bytes": 2091
+      "sha256_lf": "35d6dc013938ed0c6f184c3635065586e94de7251830cfa02db069c72f4d0a35",
+      "bytes": 3420
     },
     "references/transcoding_rules.md": {
       "sha256_lf": "7e028e2c6aec2790299a4e113be0082c1c7549782b73e2816fedfaa690617e3f",
@@ -25,5 +29,5 @@
       "bytes": 3085
     }
   },
-  "total_files": 5
+  "total_files": 6
 }
