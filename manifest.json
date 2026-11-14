@@ -2,17 +2,17 @@
   "schema_version": "1.0",
   "repo": "ronot-creator/gemini-skill-factory",
   "branch": "main",
-  "updated_at": "2026-11-14T11:43:27Z",
+  "updated_at": "2026-11-14T12:10:00Z",
   "raw_base": "https://raw.githubusercontent.com/ronot-creator/gemini-skill-factory/main",
   "pure_markdown": true,
   "skills": {
     "gemini-skill-factory": {
-      "version": "3.2.0",
+      "version": "3.2.1",
       "entry": "SKILL.md",
       "files": {
         "SKILL.md": {
-          "sha256_lf": "b4d548a0341ce5ee71de986176431fb83ce2e9f7de3ce35dae8697b3a3d4bf55",
-          "bytes": 9076
+          "sha256_lf": "2611fe63c1dc69918bf3d2018ee03b75e5fad15d14fa113fb9b3fd70a62e4b07",
+          "bytes": 9371
         },
         "references/discovery_and_synthesis.md": {
           "sha256_lf": "71479d9fb41789da786585b6960717589c2fb6c399199ad5397856c2dd8a87eb",
@@ -23,8 +23,8 @@
           "bytes": 4258
         },
         "references/output_schemas.md": {
-          "sha256_lf": "35d6dc013938ed0c6f184c3635065586e94de7251830cfa02db069c72f4d0a35",
-          "bytes": 3420
+          "sha256_lf": "46b5b7d96870a394b6d9efd59b0659a8f61ee48a3174d6cf87a3a914225c709e",
+          "bytes": 4380
         },
         "references/transcoding_rules.md": {
           "sha256_lf": "7e028e2c6aec2790299a4e113be0082c1c7549782b73e2816fedfaa690617e3f",

@@ -3,7 +3,7 @@ name: gemini-skill-factory
 description: Inspect, audit, discover, cross-reference, transcode, merge, synthesize Mega-Skills, and self-update 100% Pure-Markdown, Chat-Safe Gemini Skills from 4 sources: GitHub/ZIP skill repos, general codebases, generic material (prompts/docs/SOPs), and conversational retrospectives. Features Mode E autonomous skill discovery (skills.sh & GitHub, crediting vercel-labs/skills), O(N) mergeability scoring (> 5), sharded Mega-Skill synthesis, low-token fleet self-updating via ronot-creator/gemini-skill-factory manifest.json, and automatic skill-lifecycle-guardian execution.
 allowed-tools: drive default_api skills google
 ---
-# Gemini Skill Factory (v3.2.0 - 100% Pure-Markdown, Chat-Safe)
+# Gemini Skill Factory (v3.2.1 - 100% Pure-Markdown, Chat-Safe)
 
 A universal **4-Source Pure-Markdown Skill Factory** with **Mode E Autonomous Discovery**. Automates discovery, static security and malware screening, Claude-to-Gemini portability linting, script-to-Markdown transcoding, **$O(N)$ Mergeability Scoring & Sharded Mega-Skill Synthesis**, existing-library cross-referencing, zero-loss registration/updating, and **low-token self-updating**.
 
@@ -29,7 +29,7 @@ All workflows execute natively in both **standard Gemini Chat** and **Task Mode*
 - **Mandatory $O(N)$ Mergeability & Mega-Skill Evaluation (`references/merge_strategy.md`)**: Before finalizing any multi-file or multi-skill import, **read `references/merge_strategy.md`** to:
   1. Run $O(N)$ signature bucketing and merge clusters with **Mergeability Score `> 5` (`6–10`)** into `SKILL.md` + `references/`.
   2. Detect domain-cohesive repos/clusters (`>= 4` distinct skills with `>= 70%` domain cohesion) and recommend/compile **Sharded Mega-Skills** (`SKILL.md` router + `catalogue/index.json` + `references/shard-*.md`, `<= 90` archive entries) to prevent library overpopulation.
-- **Exact Output Formatting (`references/output_schemas.md`)**: Before presenting any report, **read `references/output_schemas.md`** and reproduce its exact section headers, tables, and metadata blocks verbatim (with no `user:` or `system:` prefixes).
+- **Exact Output Formatting (`references/output_schemas.md`)**: Before presenting any report, **read `references/output_schemas.md`** and reproduce its exact section headers, tables, **Plain-English TL;DR**, and **copy-pasteable Recommended Strategy reply** verbatim (with no `user:` or `system:` prefixes).
 
 ## Mode D: Low-Token Self-Updating & Fleet Sync (`ronot-creator/gemini-skill-factory`)
 
@@ -65,10 +65,10 @@ Compare consolidated candidates against the user's installed skills (`lookup_ski
 - **D. Substantial Functional Overlap**: Merge non-redundant capabilities into the stronger existing skill.
 - **E. Incoming Skill is Inferior or Redundant**: Skip.
 
-### Step 4: Present the Standardized Report
+### Step 4: Present the Standardized Report + Plain-English TL;DR
 
 **Read `references/output_schemas.md`** and render the appropriate report (**Schema 1** for Mode C/A/B, **Schema 4** for Mode E, or **Schema 5** for Source 4 Retrospective).
-- In **Mode C**, **Mode E**, or **Source 4 Retrospective**, stop and wait for user selection/confirmation unless the user explicitly requested immediate execution.
+- In **Mode C** and **Mode E**, always include the **Plain-English TL;DR & Recommended Strategy** block right below the table—summarizing the takeaway without jargon, stating the best strategy (while preserving full user choice), and giving the exact copy-pasteable reply to run it—then stop and wait for user selection unless the user explicitly requested immediate execution.
 
 ### Step 5: Execute Creation / Import via `skill-lifecycle-guardian` & Present Final Report
 

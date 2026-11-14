@@ -22,7 +22,7 @@ Copy and paste this single prompt into Gemini:
 
 | Skill | Version | What It Does |
 | :--- | :--- | :--- |
-| **`gemini-skill-factory`** | `3.2.0` | Discovers skills autonomously (`Mode E`), synthesizes Pure-Markdown skills from **4 sources**, runs security & portability checks, cross-references existing skills (`Categories A–E`), consolidates split/megarepo skills (`O(N)` Mergeability + Sharded Mega-Skills), installs, and self-updates. |
+| **`gemini-skill-factory`** | `3.2.1` | Discovers skills autonomously (`Mode E`), synthesizes Pure-Markdown skills from **4 sources**, runs security & portability checks, cross-references existing skills (`Categories A–E`), consolidates split/megarepo skills (`O(N)` Mergeability + Sharded Mega-Skills), appends a **Plain-English TL;DR & Recommended Strategy** with a copy-pasteable reply, installs, and self-updates. |
 | **`skill-lifecycle-guardian`** | `2.0.0` | Prevents multi-file skill corruption, empty blob IDs, broken frontmatter, and orphan files across both standard Gemini Chat and Task Mode. |
 
 ---
@@ -31,11 +31,17 @@ Copy and paste this single prompt into Gemini:
 
 | Mode | Trigger | What It Does |
 | :--- | :--- | :--- |
-| **Mode C — Inspection Only (Default)** | `@gemini-skill-factory <GitHub URL or ZIP>` | Fetches metadata first, runs security + portability + mergeability + overlap checks, and prints a numbered **Inspection Report (`#1..#N`)** before installing anything. |
+| **Mode C — Inspection Only (Default)** | `@gemini-skill-factory <GitHub URL or ZIP>` | Fetches metadata first, runs security + portability + mergeability + overlap checks, prints a numbered **Inspection Report (`#1..#N`)** plus a **Plain-English TL;DR & copy-pasteable Recommended Strategy**, and waits for your choice. |
 | **Mode A — Batch Import / Direct Creation** | `@gemini-skill-factory create a skill from <source>` or `batch import` | Runs all security/portability/mergeability/overlap checks and immediately creates/updates all compatible skills in the same turn. |
 | **Mode B — Selective Import** | `Import #1, #3, and 5-7` (or by skill name) | Installs or merges only the specific items you choose from an inspection or discovery report. |
 | **Mode D — Low-Token Self-Update** | `@gemini-skill-factory check for updates` | Compares `assets/local_manifest.json` against `manifest.json` (`O(1)`), pulls only changed `.md`/`.json` files (`O(Delta)`), and updates in place. |
-| **Mode E — Autonomous Skill Discovery** | `@gemini-skill-factory find me a skill for <goal>` | Searches [`skills.sh`](https://skills.sh/) and GitHub, fetches and verifies raw `SKILL.md` files (never from snippets alone), and presents ranked candidates. |
+| **Mode E — Autonomous Skill Discovery** | `@gemini-skill-factory find me a skill for <goal>` | Searches [`skills.sh`](https://skills.sh/) and GitHub, fetches and verifies raw `SKILL.md` files (never from snippets alone), and presents ranked candidates with a **Plain-English TL;DR & copy-pasteable Recommended Strategy**. |
+
+### Plain-English TL;DR & Copy-Pasteable Reply (Every Report)
+Because technical tables can be dense, every **Mode C** Inspection Report and **Mode E** Discovery Report ends with a jargon-free summary block:
+- **TL;DR**: 1–2 plain sentences explaining what is safe/useful and whether merging is recommended.
+- **Recommended Strategy**: The best strategy in plain English (while keeping you in full control to merge, keep separate, or cherry-pick).
+- **Reply to execute this strategy**: An exact copy-pasteable prompt (e.g., `Batch Import (apply recommended Mega-Skill)` or `Import #1`), alongside quick alternatives (`Keep all separate, do not merge`).
 
 ### Mode B Selection Syntax
 When replying to an Inspection or Discovery Report, you can select items using:
@@ -59,7 +65,7 @@ Every candidate skill is cross-referenced against your already-installed Gemini 
 
 ---
 
-## Universal 4-Source Skill Synthesis (`v3.2.0`)
+## Universal 4-Source Skill Synthesis (`v3.2.0+`)
 
 `gemini-skill-factory` synthesizes 100% Pure-Markdown skills from four distinct source types:
 

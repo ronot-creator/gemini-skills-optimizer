@@ -15,8 +15,14 @@ You MUST reproduce these exact section headers, metadata blocks, and table colum
 | **#1** | `<kebab-name>` | <concise summary> | <files & external deps> | `Compatible Directly` / `Requires Modification (<flags>)` | `Passed` / `Rejected (<reason>)` | `<A/B/C/D/E>` |
 ```
 
-* **Mode C Footer (when stopping for user selection)**:
-  > Reply with **Batch Import** to install/update all compatible skills, or **Selective Import** with numbers, ranges, or names (e.g., `Import #1, #3, and 5-7`).
+* **Plain-English TL;DR & Recommended Strategy (Mandatory in Mode C)**:
+  ```markdown
+  **TL;DR:** <1–2 plain-language sentences summarizing what is safe/useful here, whether it duplicates anything you already have, and whether merging or a Mega-Skill is recommended.>
+
+  * **Recommended Strategy:** <Best strategy in plain English—e.g., "Combine #1–#5 into one Sharded Mega-Skill to avoid clutter" or "Import #1 and #3 into your existing skills; skip #2 as a duplicate." You still have full freedom to choose otherwise.>
+  * **Reply to execute this strategy:** `<exact copy-pasteable prompt, e.g., Batch Import (apply recommended Mega-Skill)>`
+  * **Or customize:** `Import #1, #3` | `Keep all separate, do not merge`
+  ```
 
 ## Schema 2: Final Operation Report (Step 5)
 
@@ -53,8 +59,14 @@ You MUST reproduce these exact section headers, metadata blocks, and table colum
 | **#1** | `<kebab-name>` | `[<owner/repo>](<URL>)` | <concise fit summary> | `Passed` / `Requires Transcoding` | `<A/B/C/D/E>` |
 ```
 
-* **Mode E Footer**:
-  > Reply with **Import #1** (or numbers/names) to transcode and install, or **Batch Import** to consolidate compatible matches.
+* **Plain-English TL;DR & Recommended Strategy (Mandatory in Mode E)**:
+  ```markdown
+  **TL;DR:** <1–2 plain-language sentences explaining which candidate fits best and whether any require transcoding or overlap with your library.>
+
+  * **Recommended Strategy:** <Best strategy in plain English—e.g., "Import #1 as a standalone skill" or "Combine #1 and #2 into one skill." You still have full freedom to choose otherwise.>
+  * **Reply to execute this strategy:** `<exact copy-pasteable prompt, e.g., Import #1>`
+  * **Or customize:** `Import #1, #2` | `Batch Import (keep separate)`
+  ```
 
 ## Schema 5: Source 4 Retrospective Patch Preview (Explicit Gate)
 
@@ -68,4 +80,4 @@ You MUST reproduce these exact section headers, metadata blocks, and table colum
 ```
 
 * **Retrospective Footer**:
-  > Reply **Apply** to persist this update via `skill-lifecycle-guardian`, or specify edits.
+  > Reply **`Apply`** to persist this update via `skill-lifecycle-guardian`, or specify edits.
